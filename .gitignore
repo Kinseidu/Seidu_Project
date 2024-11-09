@@ -1,2 +1,14 @@
 node_modules/
 .env
+node_modules/
+dist/
+build/
+.env
+logs/
+.vscode/
+.idea/
+*.pem
+*.key
+uploads/
+*.sql
+*.sqlite

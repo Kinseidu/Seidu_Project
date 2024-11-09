@@ -1,36 +1,20 @@
-// routes/doctorRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const doctorController = require('../controllers/doctorController');
 const { body } = require('express-validator');
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
-
- 
-
-
 // Doctor Login Route
 router.post('/login', doctorController.loginDoctor);
-
 
 // Get All Doctors Route
 router.get('/', isAuthenticated, doctorController.getAllDoctors);
 
-// Get Doctsor by ID Route
-router.get('/:id', doctorController.getDoctorById);
+// Get Doctor by ID Route
+router.get('/:id', isAuthenticated, doctorController.getDoctorById);
 
-// doctorRoutes.js
-router.get('/:id', (req, res, next) => {
-    console.log("getDoctorById route hit with ID:", req.params.id); // Log to confirm route is accessed
-    next();
-}, doctorController.getDoctorById);
-
-
-
-
-
-//create new doctor
+// Create New Doctor Route
+// Define the POST route for creating a new doctor
 router.post(
     '/',
     [
@@ -43,11 +27,6 @@ router.post(
     ],
     doctorController.createDoctor
 );
-
-
-
-
-
 // Update Doctor Route
 router.put(
     '/:id',

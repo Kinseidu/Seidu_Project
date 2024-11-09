@@ -4,12 +4,12 @@ const MySQLStore = require('express-mysql-session')(session);
 const dotenv = require('dotenv');
 const patientRoutes = require('./routes/patientRoutes');
 const doctorRoutes = require('./routes/doctorRoutes'); // Import doctor routes
-
-
+const adminRoutes = require('./routes/adminRoutes');  // Import admin routes
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
-const pool = require('./config/db'); // Make sure to import your MySQL pool
+const pool = require('./config/db'); // Ensure your MySQL pool is correctly set up
+const appointmentRoutes = require('./routes/appointmentRoutes'); 
 
 dotenv.config();
 
@@ -48,10 +48,12 @@ app.use(session({
 app.use('/api/patients', patientRoutes);
 
 // Doctor Routes
+app.use('/api/doctor', doctorRoutes); // Set up doctor routes with '/api/doctor' prefix
 
-app.use('/api/doctors', doctorRoutes); // Set up doctor routes with '/api/doctor' prefix
+// Admin Routes
+app.use('/api/admin', adminRoutes); // Use the correct adminRoutes
 
-
+app.use('/api/appointments', appointmentRoutes);
 
 // Basic Routes
 app.get('/', (req, res) => {
@@ -61,6 +63,9 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
     res.status(200).json({ message: 'Server is healthy.' });
 });
+
+
+
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

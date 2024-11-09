@@ -16,6 +16,11 @@ router.post('/login', adminController.loginAdmin);
 router.get('/patients', isAdmin, adminController.getAllPatients);
 router.get('/appointments', isAdmin, adminController.getAllAppointments);
 router.delete('/patients/:id', isAdmin, adminController.deletePatientByAdmin);
+// Get Patient by ID (Admin Only)
+router.get('/patients/:id', isAdmin, adminController.getPatientById);
+
+// Add the PATCH route to update appointment status
+router.patch('/appointments/:id', isAdmin, adminController.updateAppointmentStatus); // <-- This route is important!
 
 // Logout Admin
 router.post('/logout', adminController.logoutAdmin);

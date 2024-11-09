@@ -10,10 +10,10 @@ function isAuthenticated(req, res, next) {
 
 // Optional: isAdmin middleware to restrict access to admins only
 function isAdmin(req, res, next) {
-  if (req.session && req.session.admin && req.session.admin.role === 'admin') {
-      return next(); // Proceed to the next middleware/controller
+  if (req.session && req.session.adminId) {
+      return next(); // Allow access to the next route handler if the user is an admin
   }
-  res.status(403).json({ error: 'Forbidden: Admins only' }); // User is not an admin
+  return res.status(403).json({ error: 'Forbidden: Admins only' }); // Deny access if the user is not an admin
 }
 
 // Optional: isDoctor middleware to restrict access to doctors only

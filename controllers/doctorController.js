@@ -1,5 +1,3 @@
-// controllers/doctorController.js
-
 const pool = require('../config/db');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
@@ -9,6 +7,7 @@ const loginDoctor = async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Fetch the doctor by email
         const [rows] = await pool.query('SELECT * FROM Doctors WHERE email = ?', [email]);
 
         if (rows.length === 0) {
@@ -16,6 +15,8 @@ const loginDoctor = async (req, res) => {
         }
 
         const doctor = rows[0];
+
+        // Compare the password with the hashed password stored in the database
         const match = await bcrypt.compare(password, doctor.password_hash);
 
         if (!match) {
@@ -30,6 +31,7 @@ const loginDoctor = async (req, res) => {
     }
 };
 
+
 // Get All Doctors
 const getAllDoctors = async (req, res) => {
     try {
@@ -43,23 +45,8 @@ const getAllDoctors = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Get Doctor by ID
 const getDoctorById = async (req, res) => {
-    console.log('getDoctorById called');  // <-- Add this line for debugging
     const { id } = req.params;
     try {
         const [doctors] = await pool.query(
@@ -77,23 +64,23 @@ const getDoctorById = async (req, res) => {
 };
 
 
-
-
-
 // Create New Doctor function
 const createDoctor = async (req, res) => {
-    const { first_name, last_name, specialization, email, phone, schedule } = req.body;
+    const { first_name, last_name, specialization, email, phone, schedule, password } = req.body;
 
     // Validation
-    if (!first_name || !last_name || !specialization || !email || !schedule) {
+    if (!first_name || !last_name || !specialization || !email || !schedule || !password) {
         return res.status(400).json({ message: 'All required fields must be provided.' });
     }
 
     try {
-        // Insert into the database
+        // Hash the password before storing
+        const hashedPassword = await bcrypt.hash(password, 10); // Salt rounds = 10
+
+        // Insert into the database with hashed password
         const [result] = await pool.query(
-            'INSERT INTO Doctors (first_name, last_name, specialization, email, phone, schedule) VALUES (?, ?, ?, ?, ?, ?)',
-            [first_name, last_name, specialization, email, phone, schedule]
+            'INSERT INTO Doctors (first_name, last_name, specialization, email, phone, schedule, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [first_name, last_name, specialization, email, phone, schedule, hashedPassword]
         );
 
         // Send the response
@@ -106,9 +93,6 @@ const createDoctor = async (req, res) => {
         res.status(500).json({ message: 'Internal server error.', error: error.message });
     }
 };
-
-
-
 
 
 // Update Doctor
@@ -129,7 +113,7 @@ const updateDoctor = async (req, res) => {
 
         await pool.query(
             'UPDATE Doctors SET first_name = ?, last_name = ?, specialization = ?, email = ?, phone = ?, schedule = ? WHERE id = ?',
-            [first_name, last_name, specialization, email, phone, JSON.stringify(schedule), id]
+            [first_name, last_name, specialization, email, phone, schedule, id]
         );
 
         res.json({ message: 'Doctor updated successfully' });
